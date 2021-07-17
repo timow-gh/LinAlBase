@@ -1,0 +1,2 @@
+add_executable(blazeExample blazeExample.cpp)
+target_link_libraries(blazeExample PRIVATE blaze)
