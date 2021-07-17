@@ -86,7 +86,7 @@ FetchContent_Declare(
 FetchContent_GetProperties(blaze)
 string(TOLOWER "blaze" lcBlazeName)
 if (NOT ${lcBlazeName}_POPULATED)
-    set(USE_LAPACK OFF)
+    option(USE_LAPACK "" OFF)
     FetchContent_Populate(blaze)
     add_subdirectory(${${lcBlazeName}_SOURCE_DIR} ${${lcBlazeName}_BINARY_DIR})
     add_library(blaze::blaze ALIAS blaze)
