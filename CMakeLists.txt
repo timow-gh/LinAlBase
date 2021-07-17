@@ -97,7 +97,7 @@ target_link_libraries(ILinAlBase INTERFACE OpenBLAS::OpenBLAS blaze::blaze)
 set_target_properties(ILinAlBase PROPERTIES EXPORT_NAME LinAlBase)
 add_library(LinAlBase::LinAlBase ALIAS ILinAlBase)
 
-install(TARGETS ILinAlBase OpenBLAS
+install(TARGETS ILinAlBase OpenBLAS blaze
         EXPORT LinAlBaseTargetsExportSet
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
