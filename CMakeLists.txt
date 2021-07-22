@@ -92,6 +92,8 @@ install(FILES
         "${CMAKE_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake "
         DESTINATION ${${PROJECT_NAME}_INSTALL_CMAKEDIR})
 
+export(EXPORT LinAlBaseTargetsExportSet NAMESPACE LinAlBase:: FILE ${CMAKE_BINARY_DIR}/LinAlBaseTargets.cmake)
+
 if (LinAlBase_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif ()
