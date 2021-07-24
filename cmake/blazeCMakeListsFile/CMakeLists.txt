@@ -435,7 +435,7 @@ write_basic_package_version_file(
         COMPATIBILITY SameMajorVersion)
 
 configure_package_config_file(
-        ${PROJECT_SOURCE_DIR}/cmake/blaze-config.cmake
+        ${PROJECT_SOURCE_DIR}/cmake/Config.cmake.in
         ${CMAKE_BINARY_DIR}/${project_name}Config.cmake
         INSTALL_DESTINATION ${${project_name}_INSTALL_CMAKEDIR}
         PATH_VARS ${project_name}_MODULE_INSTALL_DIR

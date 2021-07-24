@@ -52,6 +52,10 @@ if (NOT blaze_POPULATED)
     FetchContent_Populate(blaze)
     file(REMOVE ${blaze_SOURCE_DIR}/CMakeLists.txt)
     file(COPY ${PROJECT_SOURCE_DIR}/cmake/blazeCMakeListsFile/CMakeLists.txt DESTINATION ${blaze_SOURCE_DIR})
+    file(REMOVE ${blaze_SOURCE_DIR}/Config.cmake.in)
+    file(REMOVE ${blaze_SOURCE_DIR}/cmake/blaze-config.cmake)
+    file(COPY ${PROJECT_SOURCE_DIR}/cmake/blazeCMakeListsFile/Config.cmake.in DESTINATION ${blaze_SOURCE_DIR}/cmake)
+
     add_subdirectory(${blaze_SOURCE_DIR} ${blaze_BINARY_DIR})
     add_library(blaze::blaze ALIAS blaze)
     install(TARGETS blaze
