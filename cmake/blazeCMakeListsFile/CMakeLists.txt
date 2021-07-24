@@ -163,7 +163,7 @@ endif ()
 set(BLAZE_CACHE_SIZE ${BLAZE_CACHE_SIZE} CACHE STRING "Cache size of the CPU in bytes." FORCE)
 
 configure_file ("${CMAKE_CURRENT_LIST_DIR}/cmake/CacheSize.h.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/blaze/config/CacheSize.h")
+                "${PROJECT_SOURCE_DIR}/blaze/config/CacheSize.h")
 
 
 #==================================================================================================
@@ -223,7 +223,7 @@ else ()
 endif ()
 
 configure_file ("${CMAKE_CURRENT_LIST_DIR}/cmake/BLAS.h.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/blaze/config/BLAS.h")
+                "${PROJECT_SOURCE_DIR}/blaze/config/BLAS.h")
 
 
 #==================================================================================================
@@ -234,7 +234,7 @@ set(BLAZE_TRANSPOSE_FLAG "blaze::columnVector" CACHE STRING "Specify the default
 set_property(CACHE BLAZE_TRANSPOSE_FLAG PROPERTY STRINGS "blaze::columnVector;blaze::rowVector")
 
 configure_file ("${CMAKE_CURRENT_LIST_DIR}/cmake/TransposeFlag.h.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/blaze/config/TransposeFlag.h")
+                "${PROJECT_SOURCE_DIR}/blaze/config/TransposeFlag.h")
 
 
 #==================================================================================================
@@ -245,7 +245,7 @@ set(BLAZE_STORAGE_ORDER "blaze::rowMajor" CACHE STRING "Specify the default stor
 set_property(CACHE BLAZE_STORAGE_ORDER PROPERTY STRINGS "blaze::rowMajor;blaze::columnMajor")
 
 configure_file ("${CMAKE_CURRENT_LIST_DIR}/cmake/StorageOrder.h.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/blaze/config/StorageOrder.h")
+                "${PROJECT_SOURCE_DIR}/blaze/config/StorageOrder.h")
 
 
 #==================================================================================================
@@ -256,7 +256,7 @@ set(BLAZE_ALIGNMENT "blaze::aligned" CACHE STRING "Specify the default alignment
 set_property(CACHE BLAZE_ALIGNMENT PROPERTY STRINGS "blaze::aligned;blaze::unaligned")
 
 configure_file ("${CMAKE_CURRENT_LIST_DIR}/cmake/Alignment.h.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/blaze/config/Alignment.h")
+                "${PROJECT_SOURCE_DIR}/blaze/config/Alignment.h")
 
 
 #==================================================================================================
@@ -267,7 +267,7 @@ set(BLAZE_PADDING "blaze::padded" CACHE STRING "Specify the default padding flag
 set_property(CACHE BLAZE_PADDING PROPERTY STRINGS "blaze::padded;blaze::unpadded")
 
 configure_file ("${CMAKE_CURRENT_LIST_DIR}/cmake/Padding.h.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/blaze/config/Padding.h")
+                "${PROJECT_SOURCE_DIR}/blaze/config/Padding.h")
 
 
 #==================================================================================================
@@ -283,7 +283,7 @@ else ()
 endif ()
 
 configure_file ("${CMAKE_CURRENT_LIST_DIR}/cmake/Vectorization.h.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/blaze/config/Vectorization.h")
+                "${PROJECT_SOURCE_DIR}/blaze/config/Vectorization.h")
 
 
 #==================================================================================================
@@ -329,7 +329,7 @@ elseif (BLAZE_SMP_THREADS STREQUAL "HPX")
 endif ()
 
 configure_file ("${CMAKE_CURRENT_LIST_DIR}/cmake/SMP.h.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/blaze/config/SMP.h")
+                "${PROJECT_SOURCE_DIR}/blaze/config/SMP.h")
 
 
 #==================================================================================================
@@ -345,7 +345,7 @@ else ()
 endif ()
 
 configure_file ("${CMAKE_CURRENT_LIST_DIR}/cmake/Restrict.h.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/blaze/config/Restrict.h")
+                "${PROJECT_SOURCE_DIR}/blaze/config/Restrict.h")
 
 
 #==================================================================================================
@@ -382,7 +382,7 @@ else ()
 endif ()
 
 configure_file ("${CMAKE_CURRENT_LIST_DIR}/cmake/Optimizations.h.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/blaze/config/Optimizations.h")
+                "${PROJECT_SOURCE_DIR}/blaze/config/Optimizations.h")
 
 
 #==================================================================================================
@@ -400,8 +400,8 @@ else ()
 endif ()
 
 configure_file ("${CMAKE_CURRENT_LIST_DIR}/cmake/Inline.h.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/blaze/config/Inline.h")
-
+                "${PROJECT_SOURCE_DIR}/blaze/config/Inline.h")
+message(STATUS "PROJECT_SOURCE_DIR/blaze/config/Inline.h. ${PROJECT_SOURCE_DIR}/blaze/config/Inline.h")
 
 #==================================================================================================
 # Installation
@@ -409,37 +409,42 @@ configure_file ("${CMAKE_CURRENT_LIST_DIR}/cmake/Inline.h.in"
 
 include(CMakePackageConfigHelpers)
 
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/blaze DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(TARGETS blaze
+        EXPORT blazeTargetsExportSet
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+set(project_name "blaze")
+
+set(${project_name}_INSTALL_CMAKEDIR
+        "${CMAKE_INSTALL_LIBDIR}/cmake/${project_name}"
+        CACHE STRING "Path to install ${project_name} Config*.cmake files to.")
+set(${project_name}_MODULE_INSTALL_DIR
+        "${CMAKE_INSTALL_LIBDIR}/cmake"
+        CACHE STRING "Path to install ${project_name}'s .cmake  module files to.")
+
+install(EXPORT blazeTargetsExportSet
+        NAMESPACE ${project_name}::
+        FILE ${project_name}Targets.cmake
+        DESTINATION ${${project_name}_INSTALL_CMAKEDIR})
+
 write_basic_package_version_file(
-   "${CMAKE_CURRENT_BINARY_DIR}/cmake/blaze-config-version.cmake"
-   VERSION ${PROJECT_VERSION}
-   COMPATIBILITY SameMajorVersion
-   )
+        ${CMAKE_BINARY_DIR}/${project_name}ConfigVersion.cmake
+        VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}
+        COMPATIBILITY SameMajorVersion)
 
-install(DIRECTORY blaze DESTINATION include)
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/blaze DESTINATION include)
-install(TARGETS blaze EXPORT blazeTargets)
+configure_package_config_file(
+        ${PROJECT_SOURCE_DIR}/cmake/blaze-config.cmake
+        ${CMAKE_BINARY_DIR}/${project_name}Config.cmake
+        INSTALL_DESTINATION ${${project_name}_INSTALL_CMAKEDIR}
+        PATH_VARS ${project_name}_MODULE_INSTALL_DIR
+        NO_SET_AND_CHECK_MACRO
+        NO_CHECK_REQUIRED_COMPONENTS_MACRO)
 
-configure_file(
-   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/blaze-config.cmake"
-   "${CMAKE_CURRENT_BINARY_DIR}/cmake/blaze-config.cmake"
-   COPYONLY
-   )
-
-export(EXPORT blazeTargets
-   FILE "${CMAKE_CURRENT_BINARY_DIR}/cmake/blaze-targets.cmake"
-   NAMESPACE blaze::
-   )
-
-export(PACKAGE blaze)
-
-install(EXPORT blazeTargets
-   FILE blaze-targets.cmake
-   NAMESPACE blaze::
-   DESTINATION share/blaze/cmake
-   )
-
-install(
-   FILES "${CMAKE_CURRENT_BINARY_DIR}/cmake/blaze-config.cmake"
-         "${CMAKE_CURRENT_BINARY_DIR}/cmake/blaze-config-version.cmake"
-   DESTINATION share/blaze/cmake
-   )
+install(FILES
+        "${CMAKE_BINARY_DIR}/${project_name}Config.cmake"
+        "${CMAKE_BINARY_DIR}/${project_name}ConfigVersion.cmake"
+        DESTINATION ${${project_name}_INSTALL_CMAKEDIR})

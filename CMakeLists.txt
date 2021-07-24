@@ -22,7 +22,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-option(LinAlBase_BUILD_EXAMPLES "" OFF)
+option(LinAlBase_BUILD_EXAMPLES "" ON)
 
 preamble()
 
@@ -39,8 +39,8 @@ FetchContent_Declare(
         GIT_TAG v3.8)
 FetchContent_GetProperties(blaze)
 if (NOT blaze_POPULATED)
-    option(USE_LAPACK "" OFF)
-    set(BLAZE_BLAS_MODE OFF CACHE BOOL "Enables/Disable the BLAS mode.")
+    option(USE_LAPACK "" ON)
+    set(BLAZE_BLAS_MODE ON CACHE BOOL "Enables/Disable the BLAS mode.")
     if (BLAZE_BLAS_MODE)
         set(BLAZE_BLAS_IS_64BIT 1 CACHE BOOL "Specify whether the used BLAS library itself is 64-bit or not.")
         set(BLAZE_BLAS_IS_PARALLEL 0 CACHE BOOL "Specify whether the used BLAS library is itself parallelized or not.")
