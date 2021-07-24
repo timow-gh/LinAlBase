@@ -73,7 +73,7 @@ install(TARGETS ILinAlBase
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 set(write_export_set_to_binary_dir ON)
-setupExportSetInstall(${PROJECT_NAME} "LinAlBaseTargetsExportSet" "write_export_set_to_binary_dir")
+setupExportSetInstall(${PROJECT_NAME} "LinAlBaseTargetsExportSet" ${write_export_set_to_binary_dir})
 
 if (LinAlBase_BUILD_EXAMPLES)
     add_subdirectory(examples)
