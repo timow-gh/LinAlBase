@@ -47,9 +47,7 @@ message(STATUS "Configuring blaze version ${PROJECT_VERSION}")
 
 add_library(blaze INTERFACE)
 target_include_directories(blaze INTERFACE
-   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>
-   $<INSTALL_INTERFACE:include>
-   )
+   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>)
 
 if(${CMAKE_VERSION} VERSION_LESS "3.8.0")
    message(STATUS "Blaze requires compiling in mode supporting C++14 features.")
@@ -448,3 +446,5 @@ install(FILES
         "${CMAKE_BINARY_DIR}/${project_name}Config.cmake"
         "${CMAKE_BINARY_DIR}/${project_name}ConfigVersion.cmake"
         DESTINATION ${${project_name}_INSTALL_CMAKEDIR})
+
+export(EXPORT blazeTargetsExportSet NAMESPACE blaze:: FILE ${CMAKE_BINARY_DIR}/blazeTargets.cmake)
