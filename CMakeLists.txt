@@ -1,17 +1,30 @@
 cmake_minimum_required(VERSION 3.19)
+
+include(FetchContent)
+FetchContent_Declare(twCMakeUtils
+        GIT_REPOSITORY https://github.com/timow-gh/twCMakeUtils.git
+        GIT_TAG main)
+FetchContent_GetProperties(twCMakeUtils)
+set(lcs_twCMakeUtils "")
+string(TOLOWER "twCMakeUtils" lcs_twCMakeUtils)
+if (NOT ${lcs_twCMakeUtils}_POPULATED)
+    FetchContent_Populate(twCMakeUtils)
+    list(APPEND CMAKE_MODULE_PATH ${${lcs_twCMakeUtils}_SOURCE_DIR}/modules)
+    include(CMakeHelperFunctions)
+endif()
+
 project(LinAlBase
         VERSION 0.1.0
         LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
-include(HelperFunctions)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 option(LinAlBase_BUILD_EXAMPLES "" OFF)
 
-include(FetchContent)
+preamble()
 
 FetchContent_Declare(
         OpenBLAS
@@ -24,11 +37,10 @@ FetchContent_Declare(
         blaze
         GIT_REPOSITORY https://bitbucket.org/blaze-lib/blaze.git
         GIT_TAG v3.8)
-
 FetchContent_GetProperties(blaze)
 if (NOT blaze_POPULATED)
-    option(USE_LAPACK "" ON)
-    set(BLAZE_BLAS_MODE ON CACHE BOOL "Enables/Disable the BLAS mode.")
+    option(USE_LAPACK "" OFF)
+    set(BLAZE_BLAS_MODE OFF CACHE BOOL "Enables/Disable the BLAS mode.")
     if (BLAZE_BLAS_MODE)
         set(BLAZE_BLAS_IS_64BIT 1 CACHE BOOL "Specify whether the used BLAS library itself is 64-bit or not.")
         set(BLAZE_BLAS_IS_PARALLEL 0 CACHE BOOL "Specify whether the used BLAS library is itself parallelized or not.")
@@ -50,49 +62,11 @@ if (NOT blaze_POPULATED)
     add_library(blaze::blaze ALIAS blaze)
 endif ()
 
-
 add_library(ILinAlBase INTERFACE)
 target_link_libraries(ILinAlBase INTERFACE OpenBLAS::OpenBLAS blaze::blaze)
 set_target_properties(ILinAlBase PROPERTIES EXPORT_NAME LinAlBase)
 add_library(LinAlBase::LinAlBase ALIAS ILinAlBase)
-install(TARGETS ILinAlBase
-        EXPORT LinAlBaseTargetsExportSet
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-set(${PROJECT_NAME}_INSTALL_CMAKEDIR
-        "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-        CACHE STRING "Path to install ${PROJECT_NAME} Config*.cmake files to.")
-set(${PROJECT_NAME}_MODULE_INSTALL_DIR
-        "${CMAKE_INSTALL_LIBDIR}/cmake"
-        CACHE STRING "Path to install ${PROJECT_NAME}'s .cmake module files to.")
-
-install(EXPORT LinAlBaseTargetsExportSet
-        NAMESPACE LinAlBase::
-        FILE LinAlBaseTargets.cmake
-        DESTINATION ${${PROJECT_NAME}_INSTALL_CMAKEDIR})
-
-write_basic_package_version_file(
-        ${CMAKE_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-        VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}
-        COMPATIBILITY SameMajorVersion)
-
-configure_package_config_file(
-        ${PROJECT_SOURCE_DIR}/cmake/Config.cmake.in
-        ${CMAKE_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-        INSTALL_DESTINATION ${${PROJECT_NAME}_INSTALL_CMAKEDIR}
-        PATH_VARS ${PROJECT_NAME}_MODULE_INSTALL_DIR
-        NO_SET_AND_CHECK_MACRO
-        NO_CHECK_REQUIRED_COMPONENTS_MACRO)
-
-install(FILES
-        "${CMAKE_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-        "${CMAKE_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake "
-        DESTINATION ${${PROJECT_NAME}_INSTALL_CMAKEDIR})
-
-export(EXPORT LinAlBaseTargetsExportSet NAMESPACE LinAlBase:: FILE ${CMAKE_BINARY_DIR}/LinAlBaseTargets.cmake)
+setupExportSetInstall(${PROJECT_NAME} "LinAlBaseTargetsExportSet")
 
 if (LinAlBase_BUILD_EXAMPLES)
     add_subdirectory(examples)
