@@ -22,7 +22,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-option(LinAlBase_BUILD_EXAMPLES "" ON)
+option(LinAlBase_BUILD_EXAMPLES "" OFF)
 
 preamble()
 
