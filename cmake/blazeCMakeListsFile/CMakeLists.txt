@@ -399,7 +399,6 @@ endif ()
 
 configure_file ("${CMAKE_CURRENT_LIST_DIR}/cmake/Inline.h.in"
                 "${PROJECT_SOURCE_DIR}/blaze/config/Inline.h")
-message(STATUS "PROJECT_SOURCE_DIR/blaze/config/Inline.h. ${PROJECT_SOURCE_DIR}/blaze/config/Inline.h")
 
 #==================================================================================================
 # Installation

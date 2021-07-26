@@ -1,6 +1,5 @@
 #include <iostream>
 #include <blaze/Math.h>
-#include <openblas/cblas.h>
 
 using blaze::StaticVector;
 using blaze::DynamicVector;
@@ -25,9 +24,5 @@ int main() {
     // Printing the result of the vector addition
     std::cout << "Adding a, b: \n";
     std::cout << "c =\n" << c << "\n";
-
-    std::cout << std::endl;
-    std::cout << "OPENBLAS_L1_DATA_SIZE: " << OPENBLAS_L1_DATA_SIZE << std::endl;
-    std::cout << "openblas_get_num_threads: " << openblas_get_num_threads() << std::endl;
     return 0;
 }

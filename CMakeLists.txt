@@ -58,19 +58,13 @@ if (NOT blaze_POPULATED)
 
     add_subdirectory(${blaze_SOURCE_DIR} ${blaze_BINARY_DIR})
     add_library(blaze::blaze ALIAS blaze)
-    install(TARGETS blaze
-            EXPORT LinAlBaseTargetsExportSet
-            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 endif ()
 
 add_library(ILinAlBase INTERFACE)
-target_link_libraries(ILinAlBase INTERFACE OpenBLAS::OpenBLAS blaze::blaze)
+target_link_libraries(ILinAlBase INTERFACE blaze::blaze OpenBLAS::OpenBLAS)
 target_include_directories(ILinAlBase
         INTERFACE
-        $<BUILD_INTERFACE:${${blaze_SOURCE_DIR}}>
+        $<BUILD_INTERFACE:${blaze_SOURCE_DIR}>
         $<BUILD_INTERFACE:${openblas_SOURCE_DIR}/include>)
 set_target_properties(ILinAlBase PROPERTIES EXPORT_NAME LinAlBase)
 add_library(LinAlBase::LinAlBase ALIAS ILinAlBase)
@@ -86,4 +80,3 @@ export(EXPORT LinAlBaseTargetsExportSet NAMESPACE LinAlBase:: FILE ${CMAKE_BINAR
 if (LinAlBase_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif ()
-
