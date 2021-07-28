@@ -22,16 +22,18 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-option(LinAlBase_BUILD_EXAMPLES "" OFF)
+option(LinAlBase_BUILD_EXAMPLES "" ON)
+option(LinAlBase_USE_OPENBLAS "" ON)
 
 preamble()
 
-FetchContent_Declare(
-        OpenBLAS
-        GIT_REPOSITORY https://github.com/timow-gh/OpenBLASWrapper.git
-        GIT_TAG main)
-FetchContent_MakeAvailable(OpenBLAS)
-
+if (LinAlBase_USE_OPENBLAS)
+    FetchContent_Declare(
+            OpenBLAS
+            GIT_REPOSITORY https://github.com/timow-gh/OpenBLASWrapper.git
+            GIT_TAG main)
+    FetchContent_MakeAvailable(OpenBLAS)
+endif ()
 
 FetchContent_Declare(
         blaze
@@ -41,12 +43,18 @@ FetchContent_GetProperties(blaze)
 if (NOT blaze_POPULATED)
     option(USE_LAPACK "" OFF)
     set(BLAZE_BLAS_MODE OFF CACHE BOOL "Enables/Disable the BLAS mode.")
-    if (BLAZE_BLAS_MODE)
-        set(BLAZE_BLAS_IS_64BIT 1 CACHE BOOL "Specify whether the used BLAS library itself is 64-bit or not.")
-        set(BLAZE_BLAS_IS_PARALLEL 0 CACHE BOOL "Specify whether the used BLAS library is itself parallelized or not.")
-        set(BLAZE_BLAS_USE_MATRIX_VECTOR_MULTIPLICATION 0 CACHE BOOL "Use BLAS kernels for dense matrix/vector multiplications instead of the default Blaze kernels.")
-        set(BLAZE_BLAS_USE_MATRIX_MATRIX_MULTIPLICATION 1 CACHE BOOL "Use BLAS kernels for dense matrix multiplications instead of the default Blaze kernels.")
-        set(BLAZE_BLAS_INCLUDE_FILE "<openblas/cblas.h>" CACHE STRING "Specify the name of the BLAS header file (e.g. with MKL the file is called mkl_cblas.h)")
+    set(BLAZE_BLAS_IS_64BIT 1 CACHE BOOL "Specify whether the used BLAS library itself is 64-bit or not." FORCE)
+    set(BLAZE_BLAS_IS_PARALLEL 0 CACHE BOOL "Specify whether the used BLAS library is itself parallelized or not." FORCE)
+    set(BLAZE_BLAS_USE_MATRIX_VECTOR_MULTIPLICATION 0 CACHE BOOL "Use BLAS kernels for dense matrix/vector multiplications instead of the default Blaze kernels." FORCE)
+    set(BLAZE_BLAS_USE_MATRIX_MATRIX_MULTIPLICATION 0 CACHE BOOL "Use BLAS kernels for dense matrix multiplications instead of the default Blaze kernels." FORCE)
+    if (LinAlBase_USE_OPENBLAS)
+        set(USE_LAPACK ON CACHE BOOL "" FORCE)
+        set(BLAZE_BLAS_MODE ON CACHE BOOL "Enables/Disable the BLAS mode." FORCE)
+        set(BLAZE_BLAS_IS_64BIT 1 CACHE BOOL "Specify whether the used BLAS library itself is 64-bit or not." FORCE)
+        set(BLAZE_BLAS_IS_PARALLEL 0 CACHE BOOL "Specify whether the used BLAS library is itself parallelized or not." FORCE)
+        set(BLAZE_BLAS_USE_MATRIX_VECTOR_MULTIPLICATION 0 CACHE BOOL "Use BLAS kernels for dense matrix/vector multiplications instead of the default Blaze kernels." FORCE)
+        set(BLAZE_BLAS_USE_MATRIX_MATRIX_MULTIPLICATION 1 CACHE BOOL "Use BLAS kernels for dense matrix multiplications instead of the default Blaze kernels." FORCE)
+        set(BLAZE_BLAS_INCLUDE_FILE "<openblas/cblas.h>" CACHE STRING "Specify the name of the BLAS header file (e.g. with MKL the file is called mkl_cblas.h)" FORCE)
     endif ()
 
     FetchContent_Populate(blaze)
@@ -61,7 +69,7 @@ if (NOT blaze_POPULATED)
 endif ()
 
 add_library(ILinAlBase INTERFACE)
-target_link_libraries(ILinAlBase INTERFACE blaze::blaze OpenBLAS::OpenBLAS)
+target_link_libraries(ILinAlBase INTERFACE blaze::blaze)
 target_include_directories(ILinAlBase
         INTERFACE
         $<BUILD_INTERFACE:${blaze_SOURCE_DIR}>

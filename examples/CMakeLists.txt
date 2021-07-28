@@ -1,2 +1,4 @@
 add_subdirectory(BlazeExample)
-add_subdirectory(OpenBlasExample)
+if (LinAlBase_USE_OPENBLAS)
+    add_subdirectory(OpenBlasExample)
+endif ()

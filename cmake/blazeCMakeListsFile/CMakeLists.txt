@@ -67,7 +67,6 @@ endif()
 option (USE_LAPACK "If enabled, checks for the presence of LAPACK during configuration. Disable if you plan on not using LAPACK operations." ON)
 
 if (USE_LAPACK)
-   find_package(OpenBLAS CONFIG REQUIRED)
    target_link_libraries(blaze INTERFACE OpenBLAS::OpenBLAS)
 endif()
 
