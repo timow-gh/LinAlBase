@@ -403,7 +403,18 @@ configure_file ("${CMAKE_CURRENT_LIST_DIR}/cmake/Inline.h.in"
 # Installation
 #==================================================================================================
 
-include(CMakePackageConfigHelpers)
+include(FetchContent)
+FetchContent_Declare(twCMakeUtils
+        GIT_REPOSITORY https://github.com/timow-gh/twCMakeUtils.git
+        GIT_TAG main)
+FetchContent_GetProperties(twCMakeUtils)
+set(lcs_twCMakeUtils "")
+string(TOLOWER "twCMakeUtils" lcs_twCMakeUtils)
+if (NOT ${lcs_twCMakeUtils}_POPULATED)
+   FetchContent_Populate(twCMakeUtils)
+   list(APPEND CMAKE_MODULE_PATH ${${lcs_twCMakeUtils}_SOURCE_DIR}/modules)
+   include(CMakeHelperFunctions)
+endif ()
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/blaze DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(TARGETS blaze
@@ -413,36 +424,6 @@ install(TARGETS blaze
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-set(project_name "blaze")
-
-set(${project_name}_INSTALL_CMAKEDIR
-        "${CMAKE_INSTALL_LIBDIR}/cmake/${project_name}"
-        CACHE STRING "Path to install ${project_name} Config*.cmake files to.")
-set(${project_name}_MODULE_INSTALL_DIR
-        "${CMAKE_INSTALL_LIBDIR}/cmake"
-        CACHE STRING "Path to install ${project_name}'s .cmake  module files to.")
-
-install(EXPORT blazeTargetsExportSet
-        NAMESPACE ${project_name}::
-        FILE ${project_name}Targets.cmake
-        DESTINATION ${${project_name}_INSTALL_CMAKEDIR})
-
-write_basic_package_version_file(
-        ${CMAKE_BINARY_DIR}/${project_name}ConfigVersion.cmake
-        VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}
-        COMPATIBILITY SameMajorVersion)
-
-configure_package_config_file(
-        ${PROJECT_SOURCE_DIR}/cmake/Config.cmake.in
-        ${CMAKE_BINARY_DIR}/${project_name}Config.cmake
-        INSTALL_DESTINATION ${${project_name}_INSTALL_CMAKEDIR}
-        PATH_VARS ${project_name}_MODULE_INSTALL_DIR
-        NO_SET_AND_CHECK_MACRO
-        NO_CHECK_REQUIRED_COMPONENTS_MACRO)
-
-install(FILES
-        "${CMAKE_BINARY_DIR}/${project_name}Config.cmake"
-        "${CMAKE_BINARY_DIR}/${project_name}ConfigVersion.cmake"
-        DESTINATION ${${project_name}_INSTALL_CMAKEDIR})
+setupExportSetInstall("blaze" "blazeTargetsExportSet")
 
 export(EXPORT blazeTargetsExportSet NAMESPACE blaze:: FILE ${CMAKE_BINARY_DIR}/blazeTargets.cmake)
