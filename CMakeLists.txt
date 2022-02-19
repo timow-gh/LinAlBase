@@ -66,16 +66,25 @@ if (NOT blaze_POPULATED)
 
     add_subdirectory(${blaze_SOURCE_DIR} ${blaze_BINARY_DIR})
     add_library(blaze::blaze ALIAS blaze)
-    target_compile_options(blaze INTERFACE
-            "-Wno-reserved-id-macro"
-            "-Wno-undef"
-            "-Wno-documentation-unknown-command"
-            "-Wno-extra-semi-stmt"
-            "-Wno-sign-conversion"
-            "-Wno-implicit-int-float-conversion"
-            "-Wno-double-promotion"
-            "-Wno-implicit-float-conversion"
-            )
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        target_compile_options(blaze INTERFACE
+                "-Wno-reserved-id-macro"
+                "-Wno-undef"
+                "-Wno-documentation-unknown-command"
+                "-Wno-extra-semi-stmt"
+                "-Wno-sign-conversion"
+                "-Wno-implicit-int-float-conversion"
+                "-Wno-double-promotion"
+                "-Wno-implicit-float-conversion"
+                )
+    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        target_compile_options(blaze INTERFACE
+                "-Wno-undef"
+                "-Wno-double-promotion"
+                )
+    else ()
+        message(WARNING "Compiler warnings for blaze are not set.")
+    endif ()
 endif ()
 
 add_library(ILinAlBase INTERFACE)
