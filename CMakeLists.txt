@@ -68,6 +68,10 @@ if (NOT blaze_POPULATED)
     add_library(blaze::blaze ALIAS blaze)
     target_compile_options(blaze INTERFACE
             "-Wno-reserved-id-macro"
+            "-Wno-undef"
+            "-Wno-documentation-unknown-command"
+            "-Wno-extra-semi-stmt"
+            "-Wno-sign-conversion"
             )
 endif ()
 
