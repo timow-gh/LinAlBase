@@ -74,6 +74,7 @@ if (NOT blaze_POPULATED)
             "-Wno-sign-conversion"
             "-Wno-implicit-int-float-conversion"
             "-Wno-double-promotion"
+            "-Wno-implicit-float-conversion"
             )
 endif ()
 
