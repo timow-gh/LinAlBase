@@ -66,6 +66,9 @@ if (NOT blaze_POPULATED)
 
     add_subdirectory(${blaze_SOURCE_DIR} ${blaze_BINARY_DIR})
     add_library(blaze::blaze ALIAS blaze)
+    target_compile_options(blaze INTERFACE
+            "-Wno-reserved-id-macro"
+            )
 endif ()
 
 add_library(ILinAlBase INTERFACE)
