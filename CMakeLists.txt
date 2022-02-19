@@ -72,7 +72,7 @@ if (NOT blaze_POPULATED)
             "-Wno-documentation-unknown-command"
             "-Wno-extra-semi-stmt"
             "-Wno-sign-conversion"
-            "-Wimplicit-int-float-conversion"
+            "-Wno-implicit-int-float-conversion"
             )
 endif ()
 
