@@ -416,14 +416,22 @@ if (NOT ${lcs_twCMakeUtils}_POPULATED)
    include(CMakeHelperFunctions)
 endif ()
 
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/blaze DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(TARGETS blaze
-        EXPORT blazeTargetsExportSet
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+if (${PROJECT_NAME}_INSTALL)
+   install(DIRECTORY ${PROJECT_SOURCE_DIR}/blaze DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+   install(TARGETS blaze
+           EXPORT blazeTargetsExportSet
+           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+           LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+           ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+           INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-setupExportSetInstall("blaze" "blazeTargetsExportSet")
+   setup_export_set_installation(
+           "blaze"
+           "blazeTargetsExportSet"
+           Config.cmake.in
+           ${PROJECT_VERSION_MAJOR} ${PROJECT_VERSION_MINOR} ${PROJECT_VERSION_PATCH}
+   )
 
-export(EXPORT blazeTargetsExportSet NAMESPACE blaze:: FILE ${CMAKE_BINARY_DIR}/blazeTargets.cmake)
+   export(EXPORT blazeTargetsExportSet NAMESPACE blaze:: FILE ${CMAKE_BINARY_DIR}/blazeTargets.cmake)
+endif ()
+

@@ -9,8 +9,8 @@ set(lcs_twCMakeUtils "")
 string(TOLOWER "twCMakeUtils" lcs_twCMakeUtils)
 if (NOT ${lcs_twCMakeUtils}_POPULATED)
     FetchContent_Populate(twCMakeUtils)
-    list(APPEND CMAKE_MODULE_PATH ${${lcs_twCMakeUtils}_SOURCE_DIR}/modules)
-    include(CMakeHelperFunctions)
+    set(utils_cmake_modules_path ${${lcs_twCMakeUtils}_SOURCE_DIR}/modules)
+    list(APPEND CMAKE_MODULE_PATH ${utils_cmake_modules_path})
 endif ()
 
 project(LinAlBase
@@ -21,11 +21,23 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
+include(setup_export_set_installation)
+include(project_preamble)
+project_preamble()
 
-option(LinAlBase_BUILD_EXAMPLES "" OFF)
-option(LinAlBase_USE_OPENBLAS "" OFF)
+if ((CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR))
+    set(IS_TOP_LEVEL_PROJECT TRUE)
+else ()
+    set(IS_TOP_LEVEL_PROJECT FALSE)
+endif ()
 
-preamble()
+if (IS_TOP_LEVEL_PROJECT)
+    option(LinAlBase_BUILD_EXAMPLES "" ON)
+else ()
+    option(LinAlBase_BUILD_EXAMPLES "" OFF)
+endif ()
+option(LinAlBase_USE_OPENBLAS "Experimental use of blaze with OpenBLAS" OFF)
+option(${PROJECT_NAME}_INSTALL "Install project targets" ON)
 
 if (LinAlBase_USE_OPENBLAS)
     FetchContent_Declare(
@@ -63,7 +75,7 @@ if (NOT blaze_POPULATED)
         file(COPY ${PROJECT_SOURCE_DIR}/cmake/blazeCMakeListsFile/CMakeLists.txt DESTINATION ${blaze_SOURCE_DIR})
         file(REMOVE ${blaze_SOURCE_DIR}/Config.cmake.in)
         file(REMOVE ${blaze_SOURCE_DIR}/cmake/blaze-config.cmake)
-        file(COPY ${PROJECT_SOURCE_DIR}/cmake/blazeCMakeListsFile/OpenBLASConfig.cmake.cmake.in DESTINATION ${blaze_SOURCE_DIR}/cmake)
+        file(COPY ${PROJECT_SOURCE_DIR}/cmake/blazeCMakeListsFile/OpenBLASConfig.cmake.in DESTINATION ${blaze_SOURCE_DIR}/cmake)
     else ()
         file(REMOVE ${blaze_SOURCE_DIR}/CMakeLists.txt)
         file(COPY ${PROJECT_SOURCE_DIR}/cmake/blazeCMakeListsFile/CMakeLists.txt DESTINATION ${blaze_SOURCE_DIR})
@@ -102,15 +114,22 @@ target_include_directories(ILinAlBase
         $<BUILD_INTERFACE:${openblas_SOURCE_DIR}/include>)
 set_target_properties(ILinAlBase PROPERTIES EXPORT_NAME LinAlBase)
 add_library(LinAlBase::LinAlBase ALIAS ILinAlBase)
-install(TARGETS ILinAlBase
-        EXPORT LinAlBaseTargetsExportSet
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-setupExportSetInstall(${PROJECT_NAME} "LinAlBaseTargetsExportSet")
-export(EXPORT LinAlBaseTargetsExportSet NAMESPACE LinAlBase:: FILE ${CMAKE_BINARY_DIR}/LinAlBaseTargets.cmake)
 
 if (LinAlBase_BUILD_EXAMPLES)
     add_subdirectory(examples)
+endif ()
+
+if (${PROJECT_NAME}_INSTALL)
+    install(TARGETS ILinAlBase blaze
+            EXPORT LinAlBaseTargetsExportSet
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+    setup_export_set_installation(
+            "${PROJECT_NAME}"
+            "LinAlBaseTargetsExportSet"
+            Config.cmake.in
+            ${PROJECT_VERSION_MAJOR} ${PROJECT_VERSION_MINOR} ${PROJECT_VERSION_PATCH}
+    )
 endif ()
