@@ -43,6 +43,7 @@ if (LinAlBase_USE_OPENBLAS)
     FetchContent_Declare(
             OpenBLAS
             GIT_REPOSITORY https://github.com/timow-gh/OpenBLASWrapper.git
+            GIT_SHALLOW TRUE
             GIT_TAG main)
     FetchContent_MakeAvailable(OpenBLAS)
 endif ()
@@ -50,6 +51,7 @@ endif ()
 FetchContent_Declare(
         blaze
         GIT_REPOSITORY https://bitbucket.org/blaze-lib/blaze.git
+        GIT_SHALLOW TRUE
         GIT_TAG v3.8)
 FetchContent_GetProperties(blaze)
 if (NOT blaze_POPULATED)
